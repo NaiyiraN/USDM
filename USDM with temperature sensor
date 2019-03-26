@@ -1,0 +1,61 @@
+#include <LiquidCrystal.h>          //Including LiquidCrystal Library
+LiquidCrystal lcd(12,11,5,4,3,2); 
+const int trigPin = 9;              //Connect the trigger pin to Arduino pin 9
+const int echoPin = 8;              //Connect the echo pin to Arduino pin 8
+float time;                         //Variable for storing time
+float S;                           //Variable for storing the distance
+int sensorPin = 0;                  //the analog pin the TMP36's Vout (sense) pin is connected to
+                                    //the resolution is 10 mV / degree centigrade with a
+                                    //500 mV offset to allow for negative temperatures
+ 
+void setup() {
+Serial.begin(9600);                  //Start the serial connection with the computer
+                                     //to view the result open the serial monitor 
+lcd.begin(16,2);                    //Initialize the LCD
+pinMode(trigPin, OUTPUT);           //Set trigPin as output
+pinMode(echoPin, INPUT);            //Set echoPin as input
+//array ArrS = [];   
+//float Average = 0;
+}
+
+ 
+void loop()                             // run over and over again
+{
+lcd.clear();
+digitalWrite(trigPin, LOW);  
+delayMicroseconds(2);
+digitalWrite(trigPin, HIGH);              //Set trigPin high for 10us, generates ultrasonic pulse
+delayMicroseconds(10);
+digitalWrite(trigPin, LOW);
+time = pulseIn(echoPin, HIGH);           //Set echoPin high to receive ultrasonic signal
+S= time*0.0331/2;                        //Calculate the distance travelled in cm
+//ArrS .= S
+//Average = (ArrS[-10] + ArrS[-9] + ArrS[-8] + ArrS[-7] + ArrS[-6] + ArrS[-5] + ArrS[-4] + ArrS[-3] + ArrS[-2] + ArrS[-1])
+lcd.setCursor(0,0);                       // Set start location of LCD 
+ //getting the voltage reading from the temperature sensor
+ int reading = analogRead(sensorPin);  
+ 
+ // converting that reading to voltage, for 3.3v arduino use 3.3
+ float voltage = reading * 3.3;
+ voltage /= 1024.0; 
+ 
+ // print out the voltage
+ Serial.print(voltage); Serial.println(" volts");
+ 
+ // now print out the temperature
+ float temperatureC = (voltage - 0.5) * 100 ;        //converting from 10 mv per degree wit 500 mV offset
+                                                     //to degrees ((voltage - 500mV) times 100)
+ Serial.print(temperatureC); Serial.println(" degrees C");
+ 
+lcd.setCursor(0,0);                                  // Set start location of LCD characters
+lcd.print(temperatureC); 
+lcd.print(" C");
+lcd.setCursor(0,1); 
+lcd.print("Dist: "); 
+lcd.print(S); 
+lcd.print(" cm");
+
+
+ 
+ delay(1000);                                     //waiting a second
+}
